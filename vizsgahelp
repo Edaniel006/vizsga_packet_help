@@ -1,0 +1,43 @@
+ssh config
+configure terminal
+
+hostname Switch1
+ip domain-name lab.local
+
+username admin privilege 15 secret MySecurePassword!
+
+crypto key generate rsa modulus 2048
+
+ip ssh version 2
+
+line vty 0 15
+ login local
+ transport input ssh
+
+end
+write memory
+8
+! OSPF
+router ospf 1
+ network X.X.X.X W.W.W.W area 0
+
+! HSRP
+standby 1 ip X.X.X.X
+standby 1 priority 110
+standby 1 preempt
+
+! Static Route
+ip route DEST MASK NEXT-HOP
+
+! EtherChannel (LACP)
+interface range g0/1-2
+ channel-group 1 mode active
+
+! DHCP
+ip dhcp pool LAN
+ network X.X.X.X MASK
+ default-router X.X.X.X
+
+! NAT/PAT
+access-list 1 permit NETWORK WILDCARD
+ip nat inside source list 1 interface g0/1 overload
